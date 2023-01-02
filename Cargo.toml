@@ -1,0 +1,11 @@
+[package]
+name = "timetableau"
+version = "0.1.0"
+authors = ["Zachary Whiteley <z.n.whiteley@gmail.com>"]
+description = "A timetable managing application"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+repository = "https://github.com/zwhiteley/timetableau"
+edition = "2021"
+
+[dependencies]
