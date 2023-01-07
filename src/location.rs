@@ -1,58 +1,5 @@
+use crate::RangedU8;
 use std::fmt::{self, Display, Formatter, Write};
-use std::ops::Range;
-
-/// A ranged unsigned 8-bit integer type.
-///
-/// A ranged integer is an integer which must take a specific value within a
-/// range of possible values -- in this case, the value must be in the range
-/// `min..=max`.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-#[repr(transparent)] /* use the same representation as a normal u8 */
-pub struct RangedU8<const min: u8, const max: u8>(u8);
-
-impl<const min: u8, const max: u8> RangedU8<min, max> {
-    /// Creates a new `RangedU8<min, max>`.
-    ///
-    /// # Returns
-    ///
-    /// [`Some(RangedU8<min, max>)`](Some) if the `value` provided is within
-    /// the range `min..=max`, or [`None`] if the `value` provided is outside
-    /// that range.
-    // There are two reasons panic is not used here:
-    //  1. Allows new(u8) to be a const function
-    //  2. Allows the consumer to have more control (they can use unwrap()
-    //     if they want to panic or they can do something else if they don't
-    //     want to panic)
-    pub const fn new(value: u8) -> Option<Self> {
-        // Ensure the value is within the range `min..=max`
-        if value >= min && value <= max {
-            // If the value is within the range, return Some(v)
-            Some(Self(value))
-        } else {
-            // Otherwise, return None
-            None
-        }
-    }
-
-    /// Retrieve the inner value of the RangedU8.
-    pub const fn get(self) -> u8 {
-        self.0
-    }
-}
-
-impl<const min: u8, const max: u8> From<RangedU8<min, max>> for u8 {
-    fn from(value: RangedU8<min, max>) -> Self {
-        value.get()
-    }
-}
-
-impl<const min: u8, const max: u8> TryFrom<u8> for RangedU8<min, max> {
-    type Error = ();
-
-    fn try_from(value: u8) -> Result<Self, Self::Error> {
-        Self::new(value).ok_or(())
-    }
-}
 
 /// A block at the Highfield school.
 ///
@@ -99,8 +46,7 @@ impl Display for HighfieldFloor {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Self::Ground => formatter.write_char('G'),
-            Self::Level(level) =>
-                write!(formatter, "{}", level.get()),
+            Self::Level(level) => write!(formatter, "{}", level.get()),
         }
     }
 }
@@ -159,7 +105,7 @@ pub struct FearnhillRoom;
 // See DL#0001 for more information
 impl Default for FearnhillRoom {
     fn default() -> Self {
-       FearnhillRoom
+        FearnhillRoom
     }
 }
 
@@ -179,14 +125,14 @@ pub enum Location {
     Highfield(HighfieldRoom),
 
     /// The location of a room at the Fearnhill school.
-    Fearnhill(FearnhillRoom)
+    Fearnhill(FearnhillRoom),
 }
 
 impl Display for Location {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
         match self {
             Self::Highfield(room) => room.fmt(formatter),
-            Self::Fearnhill(room) => room.fmt(formatter)
+            Self::Fearnhill(room) => room.fmt(formatter),
         }
     }
 }
