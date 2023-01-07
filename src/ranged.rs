@@ -37,9 +37,7 @@ macro_rules! ranged_types {
                     }
                 }
 
-                /// Retrieve the inner value of the
-                #[doc = concat!(stringify!($name))]
-                /// .
+                #[doc = concat!("Get the inner value of the `", stringify!($name), "`.")]
                 pub const fn get(self) -> $type {
                     self.0
                 }
