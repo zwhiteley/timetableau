@@ -3,7 +3,7 @@ use chrono::prelude::*;
 use num_traits::FromPrimitive;
 use std::fmt::{self, Debug, Formatter};
 
-/// The week of a rotating two-week timetable.
+/// The week of a alternating two-week timetable.
 ///
 /// *See the [`crate`] documentation for more information*.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -76,7 +76,7 @@ impl TimeSlot {
     }
 }
 
-/// A specific period on Highfield's two-week rotating timetable.
+/// A specific period on Highfield's two-week alternating timetable.
 ///
 /// *See the [`crate`] documentation for more information*.
 ///
@@ -198,7 +198,7 @@ impl Period {
 /// ```
 /// # use timetableau::{Week, TimeSlot, period};
 /// # use chrono::prelude::*;
-///
+/// #
 /// # fn main() {
 /// // Create the week one thursday second period
 /// let period = period!(W1RP2);
@@ -211,7 +211,7 @@ impl Period {
 ///
 /// # Remarks
 ///
-/// The `WDP` format provided *MUST* be uppercase -- lowercase `WDP`s will
+/// The `WDP` format provided **MUST** be uppercase -- lowercase `WDP`s will
 /// fail to match.
 #[macro_export]
 macro_rules! period {
@@ -377,6 +377,8 @@ macro_rules! period {
         $crate::Period::with_index($crate::RangedU8::new(49).unwrap())
     };
 }
+
+pub(crate) use period;
 
 #[cfg(test)]
 mod tests {
