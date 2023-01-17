@@ -60,14 +60,15 @@ pub struct HighfieldRoom {
     /// The floor on which the room is located.
     pub floor: HighfieldFloor,
 
-    /// The room number.
+    /// The room discriminator -- this is used to assign each room a unique
+    /// identity.
     ///
     /// # Remarks
     ///
     /// Must be a number in the range `1..100`.
     // The primary reason [`RangedU8`] is used instead of u8 is to allow the
     // field to be made public
-    pub number: RangedU8<1, 99>,
+    pub discriminator: RangedU8<1, 99>,
 }
 
 impl Display for HighfieldRoom {
@@ -85,7 +86,7 @@ impl Display for HighfieldRoom {
         // `27` will formatted as `27`
         // `108` is outside the range for the RangedU8, and we therefore do not
         // have to worry about it
-        write!(formatter, "{:0>2}", self.number.get())
+        write!(formatter, "{:0>2}", self.discriminator.get())
     }
 }
 
