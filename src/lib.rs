@@ -70,7 +70,7 @@
 //! activities a person has to undertake on a recurring basis (typically used
 //! to describe the lessons/courses of a student/teacher) -- each full
 //! completion of the timetable is referred to as an iteration of that
-//! timetable.For example, a university professor might have a weekly timetable
+//! timetable. For example, a university professor might have a weekly timetable
 //! which describes the lessons they have every week (i.e., the timetable
 //! contains one week of lessons, which is repeated every week).
 //!
@@ -100,17 +100,17 @@
 //! consequently, days on which activities cannot occur will be referred to as
 //! "inactive days".
 //!
-//! Each active day, in turn, contains information about a set of `5` time
-//! slots during which an activity can occur. It is impossible for a lesson to
-//! occur outside of a pre-approved time slot, or for a time slot to only
+//! Each active day, in turn, contains information about a set of `5` periods
+//! during which an activity can occur. It is impossible for a lesson to
+//! occur outside of a pre-approved period, or for a period to only
 //! be partially utilised (i.e., it is impossible to use only a fraction of
-//! a time slot) -- it should be noted that it is perfectly possible for an
-//! activity to span multiple time slots.
+//! a period) -- it should be noted that it is perfectly possible for an
+//! activity to span multiple periods.
 //!
-//! The pre-approved time slots are as follows (these time slots are the same
+//! The pre-approved periods are as follows (these periods are the same
 //! for every active day):
 //!
-//! | Time slot | Start Time | End Time |
+//! | Period    | Start Time | End Time |
 //! |-----------|------------|----------|
 //! | First     | 08:50      | 09:50    |
 //! | Second    | 09:50      | 10:50    |
@@ -118,7 +118,7 @@
 //! | Fourth    | 12:10      | 13:10    |
 //! | Fifth     | 13:55      | 14:55    |
 //!
-//! It should be noted that the end time is **not** included in the time slot
+//! It should be noted that the end time is **not** included in the period
 //! (e.g., `09:50` belongs to the second time slot, not the first).
 //!
 //! ### Example Timetable
@@ -158,7 +158,7 @@
 //! ### WDF Notation
 //!
 //! WDF notation is a shorthand method of referring to an individual
-//! period within Highfield's timetable -- it takes the form of `W#D#P#`:
+//! timeslot within Highfield's timetable -- it takes the form of `W#D#P#`:
 //!
 //! * The first `#` refers to the week (this can be either `1` or `2`).
 //!
@@ -167,7 +167,7 @@
 //!    and Sunday are inactive days and cannot be referred to using this
 //!    notation).
 //!
-//! * The third and final `#` refers to the time slot (this has to be a number
+//! * The third and final `#` refers to the period (this has to be a number
 //!    between `1`, for first, and `5`, for fifth, inclusive).
 //!
 //! For example, `W1DMP2` refers to the second timeslot on a week one Monday,
@@ -177,7 +177,7 @@
 //! In some cases, it may be necessary to refer to the iteration of a
 //! timetable -- to refer to a specific iteration using this notation, prefix
 //! the notation with `I#`, where `#` is the iteration (e.g., `I2W1DMP2` refers
-//! to the second timeslot on a Monday on the second iteration of week one).
+//! to the second period on a Monday on the second iteration of week one).
 //!
 //! ## Activities
 //!
@@ -192,16 +192,16 @@
 //! * Home study (where you study any subject at home).
 //! * A break (from work).
 //!
-//! Each activity must span one (or more) timeslots, and must not partially
-//! utilise a timeslot (e.g., an activity may not use `1.5` timeslots), or
-//! span several broken-up timeslots (e.g., an activity cannot span over
-//! timeslots two and three as they are broken up by a twenty-minute break).
+//! Each activity must span one (or more) periods, and must not partially
+//! utilise a periods (e.g., an activity may not use `1.5` periods), or
+//! span several broken-up periods (e.g., an activity cannot span over
+//! periods two and three as they are broken up by a twenty-minute break).
 //!
 //! [the Highfield school]: https://highfield.herts.sch.uk/
 //! [the Fearnhill school]: https://fearnhill.herts.sch.uk/
 
 pub use location::{FearnhillRoom, HighfieldBlock, HighfieldFloor, HighfieldRoom, Location};
-pub use period::{Period, TimeSlot, Week};
+pub use timeslot::{Period, TimeSlot, Week};
 pub use ranged::*;
 
 mod ranged;
@@ -210,4 +210,4 @@ mod ranged;
 /// within the Highfield school and the Fearnhill school.
 mod location;
 
-mod period;
+mod timeslot;
