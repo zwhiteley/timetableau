@@ -33,34 +33,79 @@
 //!
 //! ### Highfield's Room Numbering Scheme
 //!
-//! Highfield has the following room numbering scheme: `BF##`:
+//! Highfield has the following room numbering scheme for its
+//! classrooms: `BF##`:
 //!
-//! * The `B` refers to the block in which the room is located -- this can
+//! * The `B` refers to the block in which the classroom is located -- this can
 //!   be any one of the following: `H` for Howard, `P` for Parker, and `U`
 //!   for Unwin.
 //!
-//! * The `F` refers to the floor on which the room is located -- this can
+//! * The `F` refers to the floor on which the classroom is located -- this can
 //!   be `G` for the ground floor, or `n` for the nth floor (note: `n` must
 //!   be a single digit number).
 //!
-//! * The `##` refers to the discriminator -- there are multiple rooms on
+//! * The `##` refers to the discriminator -- there are multiple classrooms on
 //!   every floor of every block: the discriminator, which is a two digit
-//!   number, allows persons to distinguish between these rooms.
+//!   number, allows persons to distinguish between these classrooms.
 //!
-//! Here are some examples of Highfield rooms:
+//! Here are some examples of Highfield classrooms:
 //!
-//! * `HG01` refers to a room on the ground floor of the Howard block with
-//!   discriminator `01`.
+//! * `HG01` refers to a classroom on the ground floor of the Howard block
+//!   with discriminator `01`.
 //!
-//! * `P212` refers to a room on the second floor of the Parker block with
-//!   discriminator `12`.
+//! * `P212` refers to a classroom on the second floor of the Parker block
+//!   with discriminator `12`.
 //!
-//! * `U111` refers to a room on the first floor of the Unwin block with
-//!   discriminator `11`.
+//! * `U111` refers to a classroom on the first floor of the Unwin block
+//!   with discriminator `11`.
+//!
+//! It should be noted that not all rooms at the Highfield school use this
+//! numbering scheme -- there are two primary reasons for this: the room does
+//! not benefit from using the scheme (e.g., the hall or the cafeteria are
+//! much better described using their names rather than Highfield's RNS), and
+//! history (e.g., the sports hall existed before Highfield's RNS was
+//! finalised).
+//!
+//! Any room that does use Highfield's RNS is referred to as a classroom.
 //!
 //! ### Fearnhill's Room Numbering Scheme
 //!
-//! At the time of writing, Fearnhill's room numbering scheme remains unknown.
+//! Fearnhill has the following room numbering scheme for its classrooms:
+//! `FH S#`:
+//!
+//! * As stated in [the introduction](crate), this application was meant
+//!   primarily for Highfield students, not Fearnhill students -- as some
+//!   rooms at Highfield have the same identifier as rooms at Fearnhill,
+//!   all room identifiers for Fearnhill rooms will be prepended with
+//!   `FH ` to eliminate ambiguity.
+//!
+//! * The `S` refers to the section in which the room is located -- the section
+//!   describes what subject for which the room is intended and can be any one
+//!   of the following:
+//!
+//!   - `S` for `Science`
+//!   - `B` for `Business`
+//!   - `P` for `PSHE`
+//!   - `L` for `Languages`
+//!   - `T` for `Technology`
+//!   - `M` for `Mathematics`
+//!   - `E` for `English`
+//!   - `Mu` for `Music`
+//!   - `H` for `Humanities`
+//!   - `I` for `IT`
+//!
+//! * The `#` refers to the discriminator -- this is used to assign each
+//!   classroom within each section a unique identity (i.e., such that two
+//!   classrooms in the same section do not have the same identifier).
+//!
+//! Here are some examples of Fearnhill classrooms:
+//!
+//! * `FH S13` for a room with discriminator `13` in the `Science` section.
+//! * `FH B1` for a room with discriminator `1` in the `Business` section.
+//! * `FH Mu2` for a room with discriminator `2` in the `Music` section.
+//!
+//! Like Highfield, not all rooms at the Fearnhill school use this RNS -- all
+//! rooms that do use this RNS are referred to as classrooms.
 //!
 //! ## The timetable format
 //!
@@ -163,12 +208,12 @@
 //! * The first `#` refers to the week (this can be either `1` or `2`).
 //!
 //! * The second `#` refers to the day (this is the first letter of the
-//!    weekday of the period -- `R` is used to represent Thursday, Saturday
-//!    and Sunday are inactive days and cannot be referred to using this
-//!    notation).
+//!   weekday of the period -- `R` is used to represent Thursday, Saturday
+//!   and Sunday are inactive days and cannot be referred to using this
+//!   notation).
 //!
 //! * The third and final `#` refers to the period (this has to be a number
-//!    between `1`, for first, and `5`, for fifth, inclusive).
+//!   between `1`, for first, and `5`, for fifth, inclusive).
 //!
 //! For example, `W1DMP2` refers to the second timeslot on a week one Monday,
 //! `W2DRP5` refers to the last timeslot of a week two Thursday, and `W1DSP1`
@@ -200,9 +245,11 @@
 //! [the Highfield school]: https://highfield.herts.sch.uk/
 //! [the Fearnhill school]: https://fearnhill.herts.sch.uk/
 
-pub use location::{FearnhillRoom, HighfieldBlock, HighfieldFloor, HighfieldRoom, Location};
-pub use timeslot::{Period, TimeSlot, Week};
+pub use location::{
+    FearnhillRoom, FearnhillSection, HighfieldBlock, HighfieldFloor, HighfieldRoom, Location,
+};
 pub use ranged::*;
+pub use timeslot::{Period, TimeSlot, Week};
 
 mod ranged;
 

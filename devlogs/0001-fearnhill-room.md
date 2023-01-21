@@ -1,6 +1,6 @@
 * Identifier: DL#0001
 * Created: 2023-01-06
-* Status: Active
+* Status: Resolved
 
 # Summary
 
@@ -67,6 +67,14 @@ accommodate the modification to the `FearnhillRoom` struct.
   relatively difficult to give the student advice on the exact location
   of the room (e.g., it would become difficult to tell a student that
   the room `HG04` is on the ground floor of the Howard block).
+ 
+# Resolution
+
+Information about Fearnhill's RNS was obtained much earlier than previously
+thought -- as a result, the Fearnhill data structures have not yet been used
+in the wider application, and can be changed freely to fit Fearnhill's RNS
+(i.e., backwards-compatibility does not need to be maintained as neither the
+Fearnhill data structures have been used or the application released).
 
 [^1]: This universal value must be fully backwards-compatible if the
       application is deployed before Fearnhill RNS support is fully
