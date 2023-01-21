@@ -1,5 +1,3 @@
-use std::fmt::{self, Display, Formatter};
-
 macro_rules! ranged_types {
     ( $( $( #[$attr: meta] ) * $name: ident($type: ty); )+ ) => {
         $(

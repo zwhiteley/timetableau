@@ -21,7 +21,6 @@ pub enum Week {
 pub enum Period {
     // Assign the variants integer values such that they can be cast into
     // integers (for mathematical purposes)
-
     /// The first `Period` in a day taking place between `08:50` and
     /// `09:50`.
     First = 0,
@@ -71,7 +70,7 @@ impl Period {
             835..=894 => Some(Period::Fifth),
 
             // No other times are allocated
-            _ => None
+            _ => None,
         }
     }
 }
@@ -175,7 +174,11 @@ impl TimeSlot {
         // provided
         let time_slot = Period::from_time(datetime.time())?;
 
-        Some(Self { week, day, period: time_slot })
+        Some(Self {
+            week,
+            day,
+            period: time_slot,
+        })
     }
 
     /// Retrieves the `index` of the `TimeSlot`.
@@ -380,27 +383,21 @@ macro_rules! timeslot {
 
 #[cfg(test)]
 mod tests {
-    use crate::RangedU8;
     use super::*;
+    use crate::RangedU8;
 
     #[test]
     fn period_valid() {
-        let period = Period::from_time(
-            NaiveTime::from_hms_opt(12, 40, 23).unwrap()
-        );
+        let period = Period::from_time(NaiveTime::from_hms_opt(12, 40, 23).unwrap());
 
         assert_eq!(period, Some(Period::Fourth))
     }
 
     #[test]
     fn period_boundary() {
-        let period_lower = Period::from_time(
-            NaiveTime::from_hms_opt(8, 50, 22).unwrap()
-        );
+        let period_lower = Period::from_time(NaiveTime::from_hms_opt(8, 50, 22).unwrap());
 
-        let period_upper = Period::from_time(
-            NaiveTime::from_hms_opt(14, 54, 45).unwrap()
-        );
+        let period_upper = Period::from_time(NaiveTime::from_hms_opt(14, 54, 45).unwrap());
 
         assert_eq!(period_lower, Some(Period::First));
         assert_eq!(period_upper, Some(Period::Fifth));
@@ -408,18 +405,14 @@ mod tests {
 
     #[test]
     fn period_invalid() {
-        let period = Period::from_time(
-            NaiveTime::from_hms_opt(8, 49, 59).unwrap()
-        );
+        let period = Period::from_time(NaiveTime::from_hms_opt(8, 49, 59).unwrap());
 
         assert_eq!(period, None);
     }
 
     #[test]
     fn timeslot_index_valid() {
-        let timeslot = TimeSlot::with_index(
-            RangedU8::new(23).unwrap()
-        );
+        let timeslot = TimeSlot::with_index(RangedU8::new(23).unwrap());
 
         assert_eq!(timeslot.week, Week::WeekOne);
         assert_eq!(timeslot.day, Weekday::Fri);
@@ -429,13 +422,9 @@ mod tests {
 
     #[test]
     fn timeslot_index_boundary() {
-        let timeslot_lower = TimeSlot::with_index(
-            RangedU8::new(0).unwrap()
-        );
+        let timeslot_lower = TimeSlot::with_index(RangedU8::new(0).unwrap());
 
-        let timeslot_upper = TimeSlot::with_index(
-            RangedU8::new(49).unwrap()
-        );
+        let timeslot_upper = TimeSlot::with_index(RangedU8::new(49).unwrap());
 
         assert_eq!(timeslot_lower.week, Week::WeekOne);
         assert_eq!(timeslot_lower.day, Weekday::Mon);
@@ -452,53 +441,46 @@ mod tests {
     fn timeslot_time_valid() {
         let timeslot = TimeSlot::from_datetime(
             Week::WeekTwo,
-            Utc.with_ymd_and_hms(
-                2023, 1, 2,
-                10, 30, 10
-            ).unwrap()
+            Utc.with_ymd_and_hms(2023, 1, 2, 10, 30, 10).unwrap(),
         );
 
-        assert_eq!(timeslot, Some(TimeSlot {
-            week: Week::WeekTwo,
-            day: Weekday::Mon,
-            period: Period::Second
-        }));
+        assert_eq!(
+            timeslot,
+            Some(TimeSlot {
+                week: Week::WeekTwo,
+                day: Weekday::Mon,
+                period: Period::Second
+            })
+        );
     }
 
     #[test]
     fn timeslot_time_boundary() {
         let timeslot_lower = TimeSlot::from_datetime(
             Week::WeekOne,
-            Utc.with_ymd_and_hms(
-                2023, 1, 2,
-                8, 50, 0
-            ).unwrap()
+            Utc.with_ymd_and_hms(2023, 1, 2, 8, 50, 0).unwrap(),
         );
 
         let timeslot_upper = TimeSlot::from_datetime(
             Week::WeekTwo,
-            Utc.with_ymd_and_hms(
-                2023, 1, 13,
-                14, 54, 59
-            ).unwrap()
+            Utc.with_ymd_and_hms(2023, 1, 13, 14, 54, 59).unwrap(),
         );
 
-        assert_eq!(timeslot_lower, Some(TimeSlot::with_index(
-            RangedU8::new(0).unwrap()
-        )));
-        assert_eq!(timeslot_upper, Some(TimeSlot::with_index(
-            RangedU8::new(49).unwrap()
-        )));
+        assert_eq!(
+            timeslot_lower,
+            Some(TimeSlot::with_index(RangedU8::new(0).unwrap()))
+        );
+        assert_eq!(
+            timeslot_upper,
+            Some(TimeSlot::with_index(RangedU8::new(49).unwrap()))
+        );
     }
 
     #[test]
     fn timeslot_time_invalid() {
         let timeslot = TimeSlot::from_datetime(
             Week::WeekOne,
-            Utc.with_ymd_and_hms(
-                2023, 1, 1,
-                8, 50, 0
-            ).unwrap()
+            Utc.with_ymd_and_hms(2023, 1, 1, 8, 50, 0).unwrap(),
         );
 
         assert_eq!(timeslot, None);
