@@ -1,5 +1,5 @@
-use std::fmt::{self, Formatter, Display, Write};
 use crate::Location;
+use std::fmt::{self, Display, Formatter, Write};
 
 /// A subject/course which a student can undertake.
 ///
@@ -31,8 +31,8 @@ impl Subject {
 }
 
 impl Display for Subject {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
-        self.0.fmt(formatter)
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
     }
 }
 
@@ -77,8 +77,8 @@ impl Class {
 }
 
 impl Display for Class {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
-        self.0.fmt(formatter)
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        self.0.fmt(f)
     }
 }
 
@@ -101,7 +101,7 @@ pub enum Activity {
 
         /// The [`Location`] of the `Lesson` (i.e., the room in which the
         /// lesson takes place).
-        location: Location
+        location: Location,
     },
 
     /// Where the students are required to register their presence with a
@@ -149,26 +149,30 @@ pub enum Activity {
     /// a one-off event.
     ///
     /// *See the [`crate`] documentation for more information*.
-    Miscellaneous(String)
+    Miscellaneous(String),
 }
 
 impl Display for Activity {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use Activity::*;
 
         match self {
-            Lesson { subject, class, location } => {
-                subject.fmt(formatter)?;
-                formatter.write_char(' ')?;
-                class.fmt(formatter)?;
-                formatter.write_char(' ')?;
-                location.fmt(formatter)
-            },
-            Registration => formatter.write_str("Registration"),
-            Break => formatter.write_str("Break"),
-            SchoolStudy => formatter.write_str("Independent Study"),
-            HomeStudy => formatter.write_str("Home Study"),
-            Miscellaneous(description) => description.fmt(formatter)
+            Lesson {
+                subject,
+                class,
+                location,
+            } => {
+                subject.fmt(f)?;
+                f.write_char(' ')?;
+                class.fmt(f)?;
+                f.write_char(' ')?;
+                location.fmt(f)
+            }
+            Registration => f.write_str("Registration"),
+            Break => f.write_str("Break"),
+            SchoolStudy => f.write_str("Independent Study"),
+            HomeStudy => f.write_str("Home Study"),
+            Miscellaneous(description) => description.fmt(f),
         }
     }
 }

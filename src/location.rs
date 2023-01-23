@@ -13,13 +13,13 @@ pub enum HighfieldBlock {
 
 impl Display for HighfieldBlock {
     // Format the HighfieldBlock (use that block's identifier)
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use HighfieldBlock::*;
 
         match self {
-            Howard => formatter.write_char('H'),
-            Parker => formatter.write_char('P'),
-            Unwin => formatter.write_char('U'),
+            Howard => f.write_char('H'),
+            Parker => f.write_char('P'),
+            Unwin => f.write_char('U'),
         }
     }
 }
@@ -43,10 +43,10 @@ pub enum HighfieldFloor {
 impl Display for HighfieldFloor {
     // Format the HighfieldFloor
     // Use 'G' for the ground floor and the floor number for others
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Ground => formatter.write_char('G'),
-            Self::Level(level) => write!(formatter, "{}", level.get()),
+            Self::Ground => f.write_char('G'),
+            Self::Level(level) => write!(f, "{}", level.get()),
         }
     }
 }
@@ -88,19 +88,19 @@ impl Display for HighfieldRoom {
     // Format the HighfieldRoom such that it prints its room identifier
     //
     // See the crate level documentation for more information
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use HighfieldRoom::*;
 
         match self {
-            Hall => formatter.write_str("Hall"),
-            SportsHall => formatter.write_str("Sports Hall"),
+            Hall => f.write_str("Hall"),
+            SportsHall => f.write_str("Sports Hall"),
             Classroom {
                 block,
                 floor,
                 discriminator,
             } => {
-                Display::fmt(block, formatter)?;
-                Display::fmt(floor, formatter)?;
+                Display::fmt(block, f)?;
+                Display::fmt(floor, f)?;
 
                 // Format the room number such that it is padded to two digits
                 //
@@ -109,7 +109,7 @@ impl Display for HighfieldRoom {
                 // `27` will formatted as `27`
                 // `108` is outside the range for the RangedU8, and we therefore do not
                 // have to worry about it
-                write!(formatter, "{:0>2}", discriminator.get())
+                write!(f, "{:0>2}", discriminator.get())
             }
         }
     }
@@ -133,20 +133,20 @@ pub enum FearnhillSection {
 }
 
 impl Display for FearnhillSection {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use FearnhillSection::*;
 
         match self {
-            Science => formatter.write_str("S"),
-            Business => formatter.write_str("B"),
-            PSHE => formatter.write_str("P"),
-            Languages => formatter.write_str("L"),
-            Technology => formatter.write_str("T"),
-            Mathematics => formatter.write_str("M"),
-            English => formatter.write_str("E"),
-            Music => formatter.write_str("Mu"),
-            Humanities => formatter.write_str("H"),
-            IT => formatter.write_str("I"),
+            Science => f.write_str("S"),
+            Business => f.write_str("B"),
+            PSHE => f.write_str("P"),
+            Languages => f.write_str("L"),
+            Technology => f.write_str("T"),
+            Mathematics => f.write_str("M"),
+            English => f.write_str("E"),
+            Music => f.write_str("Mu"),
+            Humanities => f.write_str("H"),
+            IT => f.write_str("I"),
         }
     }
 }
@@ -190,20 +190,20 @@ pub enum FearnhillRoom {
 }
 
 impl Display for FearnhillRoom {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use FearnhillRoom::*;
 
         match self {
-            SportsHall => formatter.write_str("Sports Hall"),
-            Gym => formatter.write_str("Gym"),
-            DanceStudio => formatter.write_str("Dance Studio"),
-            DramaStudio => formatter.write_str("Drama Studio"),
+            SportsHall => f.write_str("Sports Hall"),
+            Gym => f.write_str("Gym"),
+            DanceStudio => f.write_str("Dance Studio"),
+            DramaStudio => f.write_str("Drama Studio"),
             Classroom {
                 section,
                 discriminator,
             } => {
-                Display::fmt(section, formatter)?;
-                Display::fmt(&discriminator.get(), formatter)
+                Display::fmt(section, f)?;
+                Display::fmt(&discriminator.get(), f)
             }
         }
     }
@@ -221,17 +221,17 @@ pub enum Location {
 }
 
 impl Display for Location {
-    fn fmt(&self, formatter: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            Self::Highfield(room) => Display::fmt(room, formatter),
+            Self::Highfield(room) => Display::fmt(room, f),
             Self::Fearnhill(room) => {
                 // Prepend "FH " to all Fearnhill rooms for disambiguation
                 // For example, both Highfield and Fearnhill have a
                 // "Sports Hall" -- to prevent Fearnhill's sports hall from
                 // being mistaken as Highfield's, format the identifier as
                 // "FH <room identifier>"
-                formatter.write_str("FH ")?;
-                Display::fmt(room, formatter)
+                f.write_str("FH ")?;
+                Display::fmt(room, f)
             }
         }
     }

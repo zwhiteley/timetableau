@@ -269,12 +269,12 @@
 //! [the Highfield school]: https://highfield.herts.sch.uk/
 //! [the Fearnhill school]: https://fearnhill.herts.sch.uk/
 
+pub use activity::{Activity, Class, Subject};
 pub use location::{
     FearnhillRoom, FearnhillSection, HighfieldBlock, HighfieldFloor, HighfieldRoom, Location,
 };
 pub use ranged::*;
 pub use timeslot::{Period, TimeSlot, Week};
-pub use activity::{Subject, Class, Activity};
 
 mod ranged;
 
