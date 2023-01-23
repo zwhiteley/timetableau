@@ -242,6 +242,30 @@
 //! span several broken-up periods (e.g., an activity cannot span over
 //! periods two and three as they are broken up by a twenty-minute break).
 //!
+//! ### Classes
+//!
+//! In some cases, students may have multiple teachers for a single subject
+//! (each teacher may teach different parts of the syllabus, or they may
+//! build on top of each other's lessons) -- in these cases, a student may
+//! need a way to differentiate between the teacher they have (e.g., so that
+//! they complete the necessary homework if all teachers have set homework).
+//!
+//! Alternatively, a teacher may teach the same subject in the same location
+//! for multiple different sets of students (e.g., a P.E. teacher may teach
+//! P.E. to both year sevens and year elevens) and will need a way to
+//! differentiate between the sets of students such that they can prepare
+//! correctly.
+//!
+//! In both cases, classes are used to solve this issue: a class is a group
+//! of persons (including the teacher) who regularly attend a specific lesson
+//! (it should be noted that it is possible for two otherwise different lessons
+//! to have the same class).
+//!
+//! Each class has a `reference`: a shorthand identifier/descriptor for that
+//! class -- for students, the `reference` will usually be the name of the
+//! teacher who teaches that class; for teachers, the `reference` will be
+//! the official identifier for that class assigned by the school.
+//!
 //! [the Highfield school]: https://highfield.herts.sch.uk/
 //! [the Fearnhill school]: https://fearnhill.herts.sch.uk/
 
@@ -250,6 +274,7 @@ pub use location::{
 };
 pub use ranged::*;
 pub use timeslot::{Period, TimeSlot, Week};
+pub use activity::{Subject, Class, Activity};
 
 mod ranged;
 
@@ -258,3 +283,5 @@ mod ranged;
 mod location;
 
 mod timeslot;
+
+mod activity;
