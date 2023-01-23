@@ -41,17 +41,23 @@ macro_rules! ranged_types {
                 }
             }
 
-            impl<const MIN: $type, const MAX: $type> From<$name<MIN, MAX>> for $type {
+            impl<const MIN: $type, const MAX: $type> ::core::convert::From<$name<MIN, MAX>> for $type {
                 fn from(value: $name<MIN, MAX>) -> Self {
                     value.get()
                 }
             }
 
-            impl<const MIN: $type, const MAX: $type> TryFrom<$type> for $name<MIN, MAX> {
+            impl<const MIN: $type, const MAX: $type> ::core::convert::TryFrom<$type> for $name<MIN, MAX> {
                 type Error = ();
 
-                fn try_from(value: $type) -> Result<Self, Self::Error> {
+                fn try_from(value: $type) -> ::core::result::Result<Self, Self::Error> {
                     Self::new(value).ok_or(())
+                }
+            }
+
+            impl<const MIN: $type, const MAX: $type> ::core::fmt::Display for $name<MIN, MAX> {
+                fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
+                    self.0.fmt(f)
                 }
             }
         )+
