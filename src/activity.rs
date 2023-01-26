@@ -87,6 +87,27 @@ impl Display for Class {
 /// *See the [`crate`] documentation for more information*.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Activity {
+    /// A regular recurring activity that is not known.
+    ///
+    /// The primary purpose of this variant is as a [default value] for
+    /// an `Activity` -- if the student does not have an activity,
+    /// [`None`] should be preferred, if the student does have an activity for
+    /// which no variant exists, [`Miscellaneous`] should be used.
+    ///
+    /// # Remarks
+    ///
+    /// Although the primary purpose for the variant is so that `Activity` can
+    /// have a default value, it may also be used by users: for example,
+    /// another student may be trying to create a database which contains
+    /// the timetable of each student within one of their classes -- in the
+    /// event one of the students within the class are uncooperative,
+    /// `Unknown` can be used in place of what they are timetabled to do.
+    ///
+    /// [default value]: Default
+    /// [`None`]: Self::None
+    /// [`Miscellaneous`]: Self::Miscellaneous
+    Unknown,
+
     /// A lesson.
     Lesson {
         /// The subject of the `Lesson`.
@@ -140,6 +161,15 @@ pub enum Activity {
     /// [`SchoolStudy`]: Self::SchoolStudy
     HomeStudy,
 
+    /// The student has no activity they need to complete.
+    ///
+    /// # Remarks
+    ///
+    /// Generally, [`SchoolStudy`] and [`HomeStudy`] should be used instead as
+    /// they are more descriptive (i.e., `None` conveys very little information
+    /// about what the student will/should be doing).
+    None,
+
     /// The student has a miscellaneous `Activity`.
     ///
     /// # Remarks
@@ -152,11 +182,18 @@ pub enum Activity {
     Miscellaneous(String),
 }
 
+impl Default for Activity {
+    fn default() -> Self {
+        Self::Unknown
+    }
+}
+
 impl Display for Activity {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         use Activity::*;
 
         match self {
+            Unknown => f.write_str("Unknown"),
             Lesson {
                 subject,
                 class,
@@ -172,6 +209,7 @@ impl Display for Activity {
             Break => f.write_str("Break"),
             SchoolStudy => f.write_str("Independent Study"),
             HomeStudy => f.write_str("Home Study"),
+            None => f.write_str("N/A"),
             Miscellaneous(description) => description.fmt(f),
         }
     }
