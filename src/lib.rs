@@ -145,7 +145,7 @@
 //! consequently, days on which activities cannot occur will be referred to as
 //! "inactive days".
 //!
-//! Each active day, in turn, contains information about a set of `5` periods
+//! Each active day, in turn, contains information about a set of `8` periods
 //! during which an activity can occur. It is impossible for a lesson to
 //! occur outside of a pre-approved period, or for a period to only
 //! be partially utilised (i.e., it is impossible to use only a fraction of
@@ -157,10 +157,13 @@
 //!
 //! | Period    | Start Time | End Time |
 //! |-----------|------------|----------|
+//! | Tutor     | 08:25      | 08:50    |
 //! | First     | 08:50      | 09:50    |
 //! | Second    | 09:50      | 10:50    |
+//! | Break     | 10:50      | 11:10    |
 //! | Third     | 11:10      | 12:10    |
 //! | Fourth    | 12:10      | 13:10    |
+//! | Lunch     | 13:10      | 13:55    |
 //! | Fifth     | 13:55      | 14:55    |
 //!
 //! It should be noted that the end time is **not** included in the period
@@ -212,8 +215,13 @@
 //!   and Sunday are inactive days and cannot be referred to using this
 //!   notation).
 //!
-//! * The third and final `#` refers to the period (this has to be a number
-//!   between `1`, for first, and `5`, for fifth, inclusive).
+//! * The third and final `#` refers to the period -- this can be any one of
+//!   the following:
+//!
+//!   - A number between `1`, for first period, and `5`, for the fifth period.
+//!   - A `T` for tutor time.
+//!   - A `B` for break time (the recess which starts at `10:50` and ends at `11:10`.
+//!   - An `L` for lunch time (the recess which starts at `13:10` and ends at `13:55`.
 //!
 //! For example, `W1DMP2` refers to the second timeslot on a week one Monday,
 //! `W2DRP5` refers to the last timeslot of a week two Thursday, and `W1DSP1`
