@@ -14,7 +14,91 @@ pub enum Week {
     WeekTwo = 1,
 }
 
-/// A period for a day.
+/// An active day in a [`Week`].
+///
+/// *See the [`crate`] documentation for more information*.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ActiveDay {
+    Monday = 0,
+    Tuesday = 1,
+    Wednesday = 2,
+    Thursday = 3,
+    Friday = 4,
+}
+
+impl ActiveDay {
+    /// The number of days from [`ActiveDay::Monday`].
+    ///
+    /// | Day                  | Monday | Tuesday | Wednesday | Thursday | Friday |
+    /// |----------------------|--------|---------|-----------|----------|--------|
+    /// | num_days_from_monday | 0      | 1       | 2         | 3        | 4      |
+    pub fn num_days_from_monday(self) -> usize {
+        self as usize
+    }
+}
+
+impl FromPrimitive for ActiveDay {
+    fn from_i64(n: i64) -> Option<Self> {
+        use ActiveDay::*;
+
+        Some(match n {
+            0 => Monday,
+            1 => Tuesday,
+            2 => Wednesday,
+            3 => Thursday,
+            4 => Friday,
+            _ => return None,
+        })
+    }
+
+    fn from_u64(n: u64) -> Option<Self> {
+        use ActiveDay::*;
+
+        Some(match n {
+            0 => Monday,
+            1 => Tuesday,
+            2 => Wednesday,
+            3 => Thursday,
+            4 => Friday,
+            _ => return None,
+        })
+    }
+}
+
+impl From<ActiveDay> for Weekday {
+    fn from(active_day: ActiveDay) -> Self {
+        use ActiveDay::*;
+
+        match active_day {
+            Monday => Weekday::Mon,
+            Tuesday => Weekday::Tue,
+            Wednesday => Weekday::Wed,
+            Thursday => Weekday::Thu,
+            Friday => Weekday::Fri,
+        }
+    }
+}
+
+impl TryFrom<Weekday> for ActiveDay {
+    type Error = ();
+
+    fn try_from(weekday: Weekday) -> Result<Self, Self::Error> {
+        use Weekday::*;
+
+        Ok(match weekday {
+            Mon => ActiveDay::Monday,
+            Tue => ActiveDay::Tuesday,
+            Wed => ActiveDay::Wednesday,
+            Thu => ActiveDay::Thursday,
+            Fri => ActiveDay::Friday,
+
+            // Weekday::Sat and Weekday::Sun are not active days
+            _ => return Err(()),
+        })
+    }
+}
+
+/// A period for an [`ActiveDay`].
 ///
 /// *See the [`crate`] documentation for more information*.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -102,7 +186,7 @@ impl Period {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct TimeSlot {
     pub week: Week,
-    pub day: Weekday,
+    pub day: ActiveDay,
     pub period: Period,
 }
 
@@ -129,7 +213,7 @@ impl TimeSlot {
             } else {
                 Week::WeekTwo
             },
-            day: Weekday::from_u8((index % 25) / 5).unwrap(),
+            day: ActiveDay::from_u8((index % 25) / 5).unwrap(),
             period: match index % 5 {
                 0 => Period::First,
                 1 => Period::Second,
@@ -162,12 +246,10 @@ impl TimeSlot {
     where
         Tz: TimeZone,
     {
-        let day = datetime.weekday();
-
-        // No periods are allocated slots over the weekend
-        if day == Weekday::Sat || day == Weekday::Sun {
-            return None;
-        }
+        // Convert the `Weekday` to an `ActiveDay`
+        // This fails if the `Weekday` is not an active day (i.e., if `Weekday` and `Weekday::Sat`
+        // or `Weekday::Sun`)
+        let day = datetime.weekday().try_into().ok()?;
 
         // Retrieve the correct TimeSlot for the `datetime` provided
         // Return `None` if no TimeSlot correspond to the `datetime`
@@ -186,9 +268,7 @@ impl TimeSlot {
     /// *See the [period index documentation](TimeSlot#timeslot-indexes) for
     /// more information*.
     pub fn index(self) -> usize {
-        (self.week as usize) * 25
-            + (self.day.num_days_from_monday() as usize) * 5
-            + self.period as usize
+        (self.week as usize) * 25 + self.day.num_days_from_monday() * 5 + self.period as usize
     }
 }
 
@@ -415,7 +495,7 @@ mod tests {
         let timeslot = TimeSlot::with_index(RangedU8::new(23).unwrap());
 
         assert_eq!(timeslot.week, Week::WeekOne);
-        assert_eq!(timeslot.day, Weekday::Fri);
+        assert_eq!(timeslot.day, ActiveDay::Friday);
         assert_eq!(timeslot.period, Period::Fourth);
         assert_eq!(timeslot.index(), 23);
     }
@@ -427,12 +507,12 @@ mod tests {
         let timeslot_upper = TimeSlot::with_index(RangedU8::new(49).unwrap());
 
         assert_eq!(timeslot_lower.week, Week::WeekOne);
-        assert_eq!(timeslot_lower.day, Weekday::Mon);
+        assert_eq!(timeslot_lower.day, ActiveDay::Monday);
         assert_eq!(timeslot_lower.period, Period::First);
         assert_eq!(timeslot_lower.index(), 0);
 
         assert_eq!(timeslot_upper.week, Week::WeekTwo);
-        assert_eq!(timeslot_upper.day, Weekday::Fri);
+        assert_eq!(timeslot_upper.day, ActiveDay::Friday);
         assert_eq!(timeslot_upper.period, Period::Fifth);
         assert_eq!(timeslot_upper.index(), 49);
     }
@@ -448,7 +528,7 @@ mod tests {
             timeslot,
             Some(TimeSlot {
                 week: Week::WeekTwo,
-                day: Weekday::Mon,
+                day: ActiveDay::Monday,
                 period: Period::Second
             })
         );
@@ -491,7 +571,7 @@ mod tests {
         let timeslot = timeslot!(W2RP3);
 
         assert_eq!(timeslot.week, Week::WeekTwo);
-        assert_eq!(timeslot.day, Weekday::Thu);
+        assert_eq!(timeslot.day, ActiveDay::Thursday);
         assert_eq!(timeslot.period, Period::Third);
     }
 }
