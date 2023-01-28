@@ -1,4 +1,5 @@
 use crate::RangedU8;
+#[cfg(feature = "chrono")]
 use chrono::prelude::*;
 use num_traits::FromPrimitive;
 use std::fmt::Debug;
@@ -65,6 +66,7 @@ impl FromPrimitive for ActiveDay {
     }
 }
 
+#[cfg(feature = "chrono")]
 impl From<ActiveDay> for Weekday {
     fn from(active_day: ActiveDay) -> Self {
         use ActiveDay::*;
@@ -79,6 +81,7 @@ impl From<ActiveDay> for Weekday {
     }
 }
 
+#[cfg(feature = "chrono")]
 impl TryFrom<Weekday> for ActiveDay {
     type Error = ();
 
@@ -130,6 +133,7 @@ impl Period {
     /// otherwise [`None`] will be returned.
     ///
     /// *See the [`crate`] documentation for more information*.
+    #[cfg(feature = "chrono")]
     pub fn from_time(time: NaiveTime) -> Option<Self> {
         // `time.hour() * 60 + time.minute()` calculates the number of
         // minutes the time is into the day (i.e., the number of minutes
@@ -242,6 +246,7 @@ impl TimeSlot {
     /// `week` cannot be created using the `datetime` alone -- at the time
     /// of writing, there is no known and reliable way to determine the week
     /// based on the date alone.
+    #[cfg(feature = "chrono")]
     pub fn from_datetime<Tz>(week: Week, datetime: DateTime<Tz>) -> Option<Self>
     where
         Tz: TimeZone,
@@ -466,6 +471,7 @@ mod tests {
     use super::*;
     use crate::RangedU8;
 
+    #[cfg(feature = "chrono")]
     #[test]
     fn period_valid() {
         let period = Period::from_time(NaiveTime::from_hms_opt(12, 40, 23).unwrap());
@@ -473,6 +479,7 @@ mod tests {
         assert_eq!(period, Some(Period::Fourth))
     }
 
+    #[cfg(feature = "chrono")]
     #[test]
     fn period_boundary() {
         let period_lower = Period::from_time(NaiveTime::from_hms_opt(8, 50, 22).unwrap());
@@ -483,6 +490,7 @@ mod tests {
         assert_eq!(period_upper, Some(Period::Fifth));
     }
 
+    #[cfg(feature = "chrono")]
     #[test]
     fn period_invalid() {
         let period = Period::from_time(NaiveTime::from_hms_opt(8, 49, 59).unwrap());
@@ -517,6 +525,7 @@ mod tests {
         assert_eq!(timeslot_upper.index(), 49);
     }
 
+    #[cfg(feature = "chrono")]
     #[test]
     fn timeslot_time_valid() {
         let timeslot = TimeSlot::from_datetime(
@@ -534,6 +543,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "chrono")]
     #[test]
     fn timeslot_time_boundary() {
         let timeslot_lower = TimeSlot::from_datetime(
@@ -556,6 +566,7 @@ mod tests {
         );
     }
 
+    #[cfg(feature = "chrono")]
     #[test]
     fn timeslot_time_invalid() {
         let timeslot = TimeSlot::from_datetime(

@@ -9,9 +9,13 @@ repository = "https://github.com/zwhiteley/timetableau"
 edition = "2021"
 
 [dependencies]
-chrono = "0.4"
+chrono = { version = "0.4", optional = true }
 
 # num-traits is required for the FromPrimitive trait -- without access to
 # this trait, it is impossible to use the `FromPrimitive::from_u8` method
 # for `Weekday` (from the chrono library)
 num-traits = "0.2"
+
+[features]
+default = ["chrono"]
+chrono = ["dep:chrono"]
