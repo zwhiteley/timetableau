@@ -67,6 +67,7 @@ macro_rules! ranged_types {
 // Create the ranged types
 ranged_types!(
     RangedU8(u8);
+    RangedUsize(usize);
 
     // Hide these as they aren't used -- having them clutter up documentation
     // is unnecessary: the only reason ranged types were created was because
@@ -79,4 +80,5 @@ ranged_types!(
     #[doc(hidden)] RangedI16(i16);
     #[doc(hidden)] RangedI32(i32);
     #[doc(hidden)] RangedI64(i64);
+    #[doc(hidden)] RangedIsize(isize);
 );
