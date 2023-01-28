@@ -1,4 +1,4 @@
-use crate::RangedU8;
+use crate::RangedUsize;
 #[cfg(feature = "chrono")]
 use chrono::prelude::*;
 use num_traits::FromPrimitive;
@@ -15,6 +15,11 @@ pub enum Week {
     Two = 1,
 }
 
+impl Week {
+    /// The number of `Week`s per iteration of the timetable.
+    pub const PER_ITERATION: usize = 2;
+}
+
 /// An active day in a [`Week`].
 ///
 /// *See the [`crate`] documentation for more information*.
@@ -28,6 +33,9 @@ pub enum ActiveDay {
 }
 
 impl ActiveDay {
+    /// The number of `ActiveDay`s per [`Week`].
+    pub const PER_WEEK: usize = 5;
+
     /// The number of days from [`ActiveDay::Monday`].
     ///
     /// | Day                  | Monday | Tuesday | Wednesday | Thursday | Friday |
@@ -128,6 +136,15 @@ pub enum Period {
 }
 
 impl Period {
+    /// The number of `Period`s per [`ActiveDay`].
+    pub const PER_DAY: usize = 5;
+
+    /// The number of `Period`s per [`Week`].
+    pub const PER_WEEK: usize = Self::PER_DAY * ActiveDay::PER_WEEK;
+
+    /// The number of `Period`s per iteration of the timetable.
+    pub const PER_ITERATION: usize = Self::PER_WEEK * Week::PER_ITERATION;
+
     /// Creates a new `Period` based on the `time` provided -- if the `time`
     /// provided corresponds to a `Period`, that `Period` will be returned,
     /// otherwise [`None`] will be returned.
@@ -195,6 +212,30 @@ pub struct TimeSlot {
 }
 
 impl TimeSlot {
+    /// The number of `TimeSlot`s per [`ActiveDay`].
+    ///
+    /// # Remarks
+    ///
+    /// This is the same as [`Period::PER_DAY`] as a [`Period`] is the most granular component of
+    /// a `TimeSlot`.
+    pub const PER_DAY: usize = Period::PER_DAY;
+
+    /// The number of `TimeSlot`s per [`Week`].
+    ///
+    /// # Remarks
+    ///
+    /// This is the same as [`Period::PER_WEEK`] as a [`Period`] is the most granular component of
+    /// a `TimeSlot`.
+    pub const PER_WEEK: usize = Period::PER_WEEK;
+
+    /// The number of `TimeSlot`s per iteration of the timetable.
+    ///
+    /// # Remarks
+    ///
+    /// This is the same as [`Period::PER_ITERATION`] as a [`Period`] is the most granular
+    /// component of a `TimeSlot`.
+    pub const PER_ITERATION: usize = Period::PER_ITERATION;
+
     /// Create a `TimeSlot` with an index of `index`.
     ///
     /// *See the [period index](TimeSlot#timeslot-indexes) documentation for
@@ -205,20 +246,26 @@ impl TimeSlot {
     /// It is recommended that you use the normal constructor, or the
     /// [`crate::timeslot!`] macro if you want to hardcode a value, as it makes the
     /// code significantly easier to understand.
-    pub fn with_index(index: RangedU8<0, 49>) -> Self {
+    pub fn with_index(index: RangedUsize<0, 49>) -> Self {
         // Get the inner value of the RangedU8 -- the reason a RangedU8 is used
         // is to avoid bounds checks (e.g., if a consumer passes an index of
         // `255` to the function).
         let index = index.get();
 
         Self {
-            week: if index / 25 == 0 {
+            // `index` = `week_number * PER_WEEK + day_number * PER_DAY + period_number`
+            // `index / PER_WEEK` = `week_number`
+            week: if index / Self::PER_WEEK == 0 {
                 Week::One
             } else {
                 Week::Two
             },
-            day: ActiveDay::from_u8((index % 25) / 5).unwrap(),
-            period: match index % 5 {
+            // `index % PER_WEEK` = `day_number * PER_DAY + period_number`
+            // `(index % PER_WEEK) / PER DAY` = `day_number`
+            day: ActiveDay::from_usize((index % Self::PER_WEEK) / Self::PER_DAY).unwrap(),
+
+            // `index % PER_DAY` = `period_number`
+            period: match index % Self::PER_DAY {
                 0 => Period::First,
                 1 => Period::Second,
                 2 => Period::Third,
@@ -273,7 +320,9 @@ impl TimeSlot {
     /// *See the [period index documentation](TimeSlot#timeslot-indexes) for
     /// more information*.
     pub fn index(self) -> usize {
-        (self.week as usize) * 25 + self.day.num_days_from_monday() * 5 + self.period as usize
+        (self.week as usize) * Self::PER_WEEK
+            + self.day.num_days_from_monday() * Self::PER_DAY
+            + self.period as usize
     }
 }
 
@@ -305,164 +354,164 @@ impl TimeSlot {
 macro_rules! timeslot {
     // Week One
     (W1MP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(0).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(0).unwrap())
     };
     (W1MP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(1).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(1).unwrap())
     };
     (W1MP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(2).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(2).unwrap())
     };
     (W1MP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(3).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(3).unwrap())
     };
     (W1MP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(4).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(4).unwrap())
     };
 
     (W1TP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(5).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(5).unwrap())
     };
     (W1TP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(6).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(6).unwrap())
     };
     (W1TP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(7).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(7).unwrap())
     };
     (W1TP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(8).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(8).unwrap())
     };
     (W1TP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(9).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(9).unwrap())
     };
 
     (W1WP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(10).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(10).unwrap())
     };
     (W1WP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(11).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(11).unwrap())
     };
     (W1WP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(12).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(12).unwrap())
     };
     (W1WP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(13).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(13).unwrap())
     };
     (W1WP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(14).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(14).unwrap())
     };
 
     (W1RP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(15).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(15).unwrap())
     };
     (W1RP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(16).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(16).unwrap())
     };
     (W1RP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(17).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(17).unwrap())
     };
     (W1RP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(18).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(18).unwrap())
     };
     (W1RP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(19).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(19).unwrap())
     };
 
     (W1FP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(20).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(20).unwrap())
     };
     (W1FP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(21).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(21).unwrap())
     };
     (W1FP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(22).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(22).unwrap())
     };
     (W1FP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(23).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(23).unwrap())
     };
     (W1FP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(24).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(24).unwrap())
     };
 
     // Week Two
     (W2MP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(25).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(25).unwrap())
     };
     (W2MP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(26).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(26).unwrap())
     };
     (W2MP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(27).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(27).unwrap())
     };
     (W2MP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(28).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(28).unwrap())
     };
     (W2MP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(29).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(29).unwrap())
     };
 
     (W2TP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(30).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(30).unwrap())
     };
     (W2TP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(31).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(31).unwrap())
     };
     (W2TP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(32).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(32).unwrap())
     };
     (W2TP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(33).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(33).unwrap())
     };
     (W2TP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(34).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(34).unwrap())
     };
 
     (W2WP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(35).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(35).unwrap())
     };
     (W2WP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(36).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(36).unwrap())
     };
     (W2WP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(37).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(37).unwrap())
     };
     (W2WP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(38).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(38).unwrap())
     };
     (W2WP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(39).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(39).unwrap())
     };
 
     (W2RP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(40).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(40).unwrap())
     };
     (W2RP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(41).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(41).unwrap())
     };
     (W2RP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(42).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(42).unwrap())
     };
     (W2RP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(43).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(43).unwrap())
     };
     (W2RP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(44).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(44).unwrap())
     };
 
     (W2FP1) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(45).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(45).unwrap())
     };
     (W2FP2) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(46).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(46).unwrap())
     };
     (W2FP3) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(47).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(47).unwrap())
     };
     (W2FP4) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(48).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(48).unwrap())
     };
     (W2FP5) => {
-        $crate::TimeSlot::with_index($crate::RangedU8::new(49).unwrap())
+        $crate::TimeSlot::with_index($crate::RangedUsize::new(49).unwrap())
     };
 }
 
@@ -500,7 +549,7 @@ mod tests {
 
     #[test]
     fn timeslot_index_valid() {
-        let timeslot = TimeSlot::with_index(RangedU8::new(23).unwrap());
+        let timeslot = TimeSlot::with_index(RangedUsize::new(23).unwrap());
 
         assert_eq!(timeslot.week, Week::One);
         assert_eq!(timeslot.day, ActiveDay::Friday);
@@ -510,9 +559,9 @@ mod tests {
 
     #[test]
     fn timeslot_index_boundary() {
-        let timeslot_lower = TimeSlot::with_index(RangedU8::new(0).unwrap());
+        let timeslot_lower = TimeSlot::with_index(RangedUsize::new(0).unwrap());
 
-        let timeslot_upper = TimeSlot::with_index(RangedU8::new(49).unwrap());
+        let timeslot_upper = TimeSlot::with_index(RangedUsize::new(49).unwrap());
 
         assert_eq!(timeslot_lower.week, Week::One);
         assert_eq!(timeslot_lower.day, ActiveDay::Monday);
@@ -558,11 +607,11 @@ mod tests {
 
         assert_eq!(
             timeslot_lower,
-            Some(TimeSlot::with_index(RangedU8::new(0).unwrap()))
+            Some(TimeSlot::with_index(RangedUsize::new(0).unwrap()))
         );
         assert_eq!(
             timeslot_upper,
-            Some(TimeSlot::with_index(RangedU8::new(49).unwrap()))
+            Some(TimeSlot::with_index(RangedUsize::new(49).unwrap()))
         );
     }
 
