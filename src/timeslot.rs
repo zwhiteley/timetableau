@@ -10,8 +10,8 @@ use std::fmt::Debug;
 pub enum Week {
     // Assign the variants integer values such that they can be cast into
     // integers (for mathematical purposes)
-    WeekOne = 0,
-    WeekTwo = 1,
+    One = 0,
+    Two = 1,
 }
 
 /// An active day in a [`Week`].
@@ -209,9 +209,9 @@ impl TimeSlot {
 
         Self {
             week: if index / 25 == 0 {
-                Week::WeekOne
+                Week::One
             } else {
-                Week::WeekTwo
+                Week::Two
             },
             day: ActiveDay::from_u8((index % 25) / 5).unwrap(),
             period: match index % 5 {
@@ -286,7 +286,7 @@ impl TimeSlot {
 /// // Create the week one thursday second period
 /// let timeslot = timeslot!(W1RP2);
 ///
-/// assert_eq!(timeslot.week, Week::WeekOne);
+/// assert_eq!(timeslot.week, Week::One);
 /// assert_eq!(timeslot.day, Weekday::Thu);
 /// assert_eq!(timeslot.period, Period::Second)
 /// # }
@@ -494,7 +494,7 @@ mod tests {
     fn timeslot_index_valid() {
         let timeslot = TimeSlot::with_index(RangedU8::new(23).unwrap());
 
-        assert_eq!(timeslot.week, Week::WeekOne);
+        assert_eq!(timeslot.week, Week::One);
         assert_eq!(timeslot.day, ActiveDay::Friday);
         assert_eq!(timeslot.period, Period::Fourth);
         assert_eq!(timeslot.index(), 23);
@@ -506,12 +506,12 @@ mod tests {
 
         let timeslot_upper = TimeSlot::with_index(RangedU8::new(49).unwrap());
 
-        assert_eq!(timeslot_lower.week, Week::WeekOne);
+        assert_eq!(timeslot_lower.week, Week::One);
         assert_eq!(timeslot_lower.day, ActiveDay::Monday);
         assert_eq!(timeslot_lower.period, Period::First);
         assert_eq!(timeslot_lower.index(), 0);
 
-        assert_eq!(timeslot_upper.week, Week::WeekTwo);
+        assert_eq!(timeslot_upper.week, Week::Two);
         assert_eq!(timeslot_upper.day, ActiveDay::Friday);
         assert_eq!(timeslot_upper.period, Period::Fifth);
         assert_eq!(timeslot_upper.index(), 49);
@@ -520,14 +520,14 @@ mod tests {
     #[test]
     fn timeslot_time_valid() {
         let timeslot = TimeSlot::from_datetime(
-            Week::WeekTwo,
+            Week::Two,
             Utc.with_ymd_and_hms(2023, 1, 2, 10, 30, 10).unwrap(),
         );
 
         assert_eq!(
             timeslot,
             Some(TimeSlot {
-                week: Week::WeekTwo,
+                week: Week::Two,
                 day: ActiveDay::Monday,
                 period: Period::Second
             })
@@ -537,12 +537,12 @@ mod tests {
     #[test]
     fn timeslot_time_boundary() {
         let timeslot_lower = TimeSlot::from_datetime(
-            Week::WeekOne,
+            Week::One,
             Utc.with_ymd_and_hms(2023, 1, 2, 8, 50, 0).unwrap(),
         );
 
         let timeslot_upper = TimeSlot::from_datetime(
-            Week::WeekTwo,
+            Week::Two,
             Utc.with_ymd_and_hms(2023, 1, 13, 14, 54, 59).unwrap(),
         );
 
@@ -559,7 +559,7 @@ mod tests {
     #[test]
     fn timeslot_time_invalid() {
         let timeslot = TimeSlot::from_datetime(
-            Week::WeekOne,
+            Week::One,
             Utc.with_ymd_and_hms(2023, 1, 1, 8, 50, 0).unwrap(),
         );
 
@@ -570,7 +570,7 @@ mod tests {
     fn macro_valid() {
         let timeslot = timeslot!(W2RP3);
 
-        assert_eq!(timeslot.week, Week::WeekTwo);
+        assert_eq!(timeslot.week, Week::Two);
         assert_eq!(timeslot.day, ActiveDay::Thursday);
         assert_eq!(timeslot.period, Period::Third);
     }
