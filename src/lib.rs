@@ -282,7 +282,7 @@ pub use location::{
     FearnhillRoom, FearnhillSection, HighfieldBlock, HighfieldFloor, HighfieldRoom, Location,
 };
 pub use ranged::*;
-pub use timeslot::{Period, TimeSlot, Week};
+pub use timeslot::{ActiveDay, Period, TimeSlot, Week};
 
 mod ranged;
 
